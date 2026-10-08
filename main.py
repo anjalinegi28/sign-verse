@@ -63,8 +63,6 @@ hold_label       = ""
 no_hand_frames   = 0
 current_sign_label      = ""
 current_sign_confidence = 0.0
-sentence   = ""
-last_added = ""
 
 # ── Thresholds ────────────────────────────────────────────────────────────────
 EMA_ALPHA        = 0.35
@@ -105,7 +103,7 @@ def is_ambiguous(pred: np.ndarray, margin: float = AMBIGUITY_MARGIN) -> bool:
     sorted_p = np.sort(pred)[::-1]
     return (sorted_p[0] - sorted_p[1]) < margin
 
-# ── Routes ────────────────────────────────────────────────────────────────────
+# ── SIGN VERSE Routes ─────────────────────────────────────────────────────────
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -116,17 +114,6 @@ def current_sign():
         "label":      current_sign_label,
         "confidence": round(current_sign_confidence * 100, 1)
     })
-
-@app.route('/sentence')
-def get_sentence():
-    return jsonify({"sentence": sentence})
-
-@app.route('/clear_sentence')
-def clear_sentence():
-    global sentence, last_added
-    sentence   = ""
-    last_added = ""
-    return jsonify({"status": "cleared"})
 
 @app.route('/gestures/<category>')
 def gestures(category):
@@ -175,12 +162,10 @@ def predict():
           "stability": 75,
           "hold_counter": 3,
           "hold_total": 10,
-          "sentence": "HELLO "
         }
     """
     global ema_pred, recent_indices, hold_counter, hold_label
     global no_hand_frames, current_sign_label, current_sign_confidence
-    global sentence, last_added
 
     data = request.get_json(force=True)
     has_hand = data.get('has_hand', False)
@@ -198,7 +183,7 @@ def predict():
         return jsonify({
             "label": "", "confidence": 0,
             "stability": 0, "hold_counter": 0,
-            "hold_total": HOLD_FRAMES, "sentence": sentence
+            "hold_total": HOLD_FRAMES
         })
 
     no_hand_frames = 0
@@ -261,9 +246,7 @@ def predict():
             hold_label   = label
             hold_counter = 1
 
-        if hold_counter >= HOLD_FRAMES and label != last_added:
-            sentence  += " " if label == "space" else label
-            last_added = label
+        if hold_counter >= HOLD_FRAMES:
             hold_counter = 0
     else:
         hold_counter = 0
@@ -274,7 +257,6 @@ def predict():
         "stability":   round(stability * 100),
         "hold_counter": hold_counter,
         "hold_total":   HOLD_FRAMES,
-        "sentence":    sentence
     })
 
 

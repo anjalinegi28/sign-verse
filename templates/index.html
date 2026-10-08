@@ -1,13 +1,13 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hand Sign Learning and Recognition System</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js" crossorigin="anonymous"></script>
-
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SIGN VERSE</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&amp;family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js"></script>
 <style>
 /* ===================================================================
    DESIGN TOKENS — Cyber‑Glass Midnight
@@ -829,10 +829,41 @@ html, body { height: 100%; background: var(--navy); color: var(--t1); font-famil
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.18); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(212,175,55,0.3); }
+
+/* SIGN VERSE — compact Practice Mode viewport fix */
+.practice-grid {
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.9fr);
+  gap: 20px;
+  margin-top: 14px;
+  align-items: stretch;
+}
+.cam-card {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  max-height: calc(100vh - 210px);
+}
+.cam-card canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+.practice-grid > div:last-child {
+  min-height: 0;
+}
+@media (max-height: 800px) {
+  main { padding-top: 24px; padding-bottom: 24px; }
+  .page-header { margin-bottom: 18px; }
+  .page-header h2 { font-size: 2.7rem; }
+  .practice-grid { gap: 16px; margin-top: 10px; }
+  .cam-card { max-height: calc(100vh - 175px); }
+}
+@media (max-width: 900px) {
+  .practice-grid { grid-template-columns: 1fr; }
+  .cam-card { max-height: none; }
+}
 </style>
 </head>
 <body>
-
 <!-- Background layers -->
 <canvas id="bg-canvas"></canvas>
 <div id="spotlight"></div>
@@ -844,479 +875,176 @@ html, body { height: 100%; background: var(--navy); color: var(--t1); font-famil
 <div class="aurora au3"></div>
 <div class="aurora au4"></div>
 <div class="aurora au5"></div>
-
 <!-- ==================== WELCOME ==================== -->
 <div id="welcome">
-  <div class="hero-ring"></div>
-  <div class="hero-wrap">
-    <div class="hero-badge">
-      <i class="fas fa-circle" style="font-size:0.4rem;animation:camPulse 1.5s infinite;color:var(--gold)"></i>
-      AI-Powered &nbsp;·&nbsp; Real-Time Detection
+<div class="hero-ring"></div>
+<div class="hero-wrap">
+<div class="hero-badge">
+<i class="fas fa-circle" style="font-size:0.4rem;animation:camPulse 1.5s infinite;color:var(--gold)"></i>
+      AI-Powered  ·  Real-Time Detection
     </div>
-    <h1 class="hero-title">
-      <span class="line1">Hand Sign</span>
-      <span class="line2">Learning &amp; Recognition</span>
-    </h1>
-    <p class="hero-sub">Master sign language through computer vision, interactive lessons, and real-time AI-powered feedback.</p>
-    <button class="hero-cta" onclick="initApp()">
-      <i class="fas fa-play" style="font-size:0.78rem"></i> Begin Your Journey
+<h1 class="hero-title">
+<span class="line1">SIGN VERSE</span>
+</h1>
+<p class="hero-sub">Learn and practice sign language with real-time AI-powered hand sign recognition.</p>
+<button class="hero-cta" onclick="initApp()">
+<i class="fas fa-play" style="font-size:0.78rem"></i> Begin Your Journey
     </button>
-    <div class="hero-sep"></div>
-    <div class="hero-stats">
-      <div class="hs"><div class="hs-n">26+</div><div class="hs-l">Signs</div></div>
-      <div class="hs"><div class="hs-n">8</div><div class="hs-l">Lessons</div></div>
-      <div class="hs"><div class="hs-n">3</div><div class="hs-l">Games</div></div>
-    </div>
-  </div>
+<div class="hero-sep"></div>
+<div class="hero-stats">
+       <div class="hs"><div class="hs-n">26+</div><div class="hs-l">Signs</div></div>
+       <div class="hs"><div class="hs-n">2</div><div class="hs-l">Learning Sets</div></div>
+       <div class="hs"><div class="hs-n">AI</div><div class="hs-l">Live Practice</div></div>
+     </div>
+   </div>
+ </div>
 </div>
-
+</div>
 <!-- ==================== APP ==================== -->
 <div id="app">
-  <div class="app-inner">
+<div class="app-inner">
+<nav id="sidebar">
+<div class="sidebar-logo">
+<div class="sidebar-logo-icon"><i class="fas fa-hands" style="font-size:0.88rem"></i></div>
+<span class="sidebar-logo-text">SIGN VERSE</span>
+</div>
+<div class="nav-section">
+<div class="menu-item active" id="nav-developer" onclick="showPage('user',this)"><i class="fas fa-user-circle"></i><span>Developer</span></div>
+<div class="menu-item" id="nav-lesson" onclick="showPage('lesson',this)"><i class="fas fa-book-open"></i><span>Learning Lab</span></div>
+<div class="menu-item" id="nav-practice" onclick="showPage('practice',this)"><i class="fas fa-camera"></i><span>Practice Mode</span></div>
+<div class="menu-item" id="nav-about" onclick="showPage('about',this)"><i class="fas fa-info-circle"></i><span>Project Info</span></div>
 
-    <nav id="sidebar">
-      <div class="sidebar-logo">
-        <div class="sidebar-logo-icon"><i class="fas fa-hands" style="font-size:0.88rem"></i></div>
-        <span class="sidebar-logo-text">HS Learning &amp; Recog.</span>
-      </div>
-      <div class="nav-section">
-        <div class="menu-item active" id="nav-developer" onclick="showPage('user',this)"><i class="fas fa-user-circle"></i><span>Developer</span></div>
-        <div class="menu-item" id="nav-lesson" onclick="showPage('lesson',this)"><i class="fas fa-book-open"></i><span>Learning Lab</span></div>
-        <div class="menu-item" id="nav-practice" onclick="showPage('practice',this)"><i class="fas fa-camera"></i><span>Practice Mode</span></div>
-        <div class="menu-item" id="nav-quiz" onclick="showPage('quiz',this)"><i class="fas fa-vial"></i><span>Knowledge Check</span></div>
-        <div class="menu-item" id="nav-video" onclick="showPage('video',this)"><i class="fas fa-play-circle"></i><span>Video Lectures</span></div>
-        <div class="menu-item" id="nav-game" onclick="showPage('game',this)"><i class="fas fa-gamepad"></i><span>Games</span></div>
-        <div class="menu-item" id="nav-about" onclick="showPage('about',this)"><i class="fas fa-info-circle"></i><span>Project Info</span></div>
-      </div>
-      <div class="sidebar-footer">
-        <div class="menu-item" id="nav-intro" onclick="startTour()"><i class="fas fa-compass"></i><span>Introduction</span></div>
-      </div>
-    </nav>
 
-    <main id="main">
-
-      <!-- DEVELOPER -->
-      <section id="user" class="page active">
-        <div class="page-header">
-          <h2>Developer</h2>
-          <p>Meet the creator behind Hand Sign Learning &amp; Recognition System</p>
-        </div>
-        <div class="dev-card">
-          <div class="glow-border-wrap" style="width:100%">
-            <div class="glow-border-inner" style="display:flex;align-items:center;gap:32px">
-              <div class="dev-avatar">DS</div>
-              <div class="dev-info">
-                <h3>Divyanshu Sharma</h3>
-                <p style="margin-bottom:4px">BCA AI &amp; Data Science</p>
-                <p style="color:var(--violet);font-size:0.875rem;font-weight:400;font-family:var(--f-sub)">Graphic Era University</p>
-                <div class="dev-chips">
-                  <span class="dev-chip"><i class="fas fa-graduation-cap"></i>BCA Student</span>
-                  <span class="dev-chip"><i class="fas fa-brain"></i>AI &amp; DS</span>
-                  <span class="dev-chip"><i class="fas fa-code"></i>Flask · OpenCV</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- LEARNING LAB -->
-      <section id="lesson" class="page">
-        <div class="page-header">
-          <h2>Learning Lab</h2>
-          <p>Explore sign language visually — click any card to see the full gesture</p>
-        </div>
-        <div class="lesson-tabs">
-          <button class="lesson-tab-btn active" id="ltab-alphabets" onclick="loadCategory('alphabets',this)">
-            <i class="fas fa-font"></i> Alphabets A–Z
+</div>
+<div class="sidebar-footer">
+<div class="menu-item" id="nav-intro" onclick="startTour()"><i class="fas fa-compass"></i><span>Introduction</span></div>
+</div>
+</nav>
+<main id="main">
+<!-- DEVELOPER -->
+<section class="page active" id="user">
+<div class="page-header">
+<h2>Developer</h2>
+<p>Meet the team behind SIGN VERSE</p>
+</div>
+<div class="dev-card">
+<div class="glow-border-wrap" style="width:100%">
+<div class="glow-border-inner" style="display:flex;align-items:center;gap:32px">
+<div class="dev-avatar">ST</div>
+<div class="dev-info">
+<h3>Team Signova</h3>
+<p style="margin-bottom:4px">BCA AI &amp; Data Science</p>
+<p style="color:var(--violet);font-size:0.875rem;font-weight:400;font-family:var(--f-sub)">Graphic Era deemed to be University</p>
+<div class="dev-chips">
+<span class="dev-chip"><i class="fas fa-graduation-cap"></i>BCA Students</span>
+<span class="dev-chip"><i class="fas fa-code"></i>Flask · OpenCV</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- LEARNING LAB -->
+<section class="page" id="lesson">
+<div class="page-header">
+<h2>Learning Lab</h2>
+<p>Explore sign language visually — click any card to see the full gesture</p>
+</div>
+<div class="lesson-tabs">
+<button class="lesson-tab-btn active" id="ltab-alphabets" onclick="loadCategory('alphabets',this)">
+<i class="fas fa-font"></i> Alphabets A–Z
           </button>
-          <button class="lesson-tab-btn" id="ltab-basic" onclick="loadCategory('basic',this)">
-            <i class="fas fa-hand-paper"></i> Digits
+<button class="lesson-tab-btn" id="ltab-basic" onclick="loadCategory('basic',this)">
+<i class="fas fa-hand-paper"></i> Digits
           </button>
-        </div>
-        <div id="gesture-grid" class="gesture-grid">
-          <div class="lesson-empty" style="grid-column:1/-1">
-            <i class="fas fa-hand-pointer"></i>
-            <p>Select a category above to explore signs</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- GESTURE MODAL -->
-      <div id="gesture-modal">
-        <div class="gm-panel">
-          <div class="gm-img-wrap">
-            <img id="gm-img" src="" alt="" onerror="this.style.display='none';document.getElementById('gm-ph').style.display='flex'">
-            <div id="gm-ph" class="gm-img-placeholder" style="display:none"><i class="fas fa-hand-paper"></i></div>
-          </div>
-          <div class="gm-body">
-            <div class="gm-label">Hand Sign</div>
-            <div class="gm-name" id="gm-name"></div>
-            <div class="gm-meaning" id="gm-meaning"></div>
-            <button class="gm-close-btn" onclick="closeGestureModal()"><i class="fas fa-times"></i> &nbsp;Close</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- PRACTICE -->
-      <section id="practice" class="page">
-        <div class="page-header">
-          <h2>Practice Mode</h2>
-          <p>Real-time AI detection — show your hand to the camera</p>
-        </div>
-        <div class="practice-grid">
-          <div class="cam-card">
-            <!-- Browser-side camera: raw feed (hidden) + overlay canvas -->
-            <video id="localVideo" autoplay playsinline muted style="display:none"></video>
-            <canvas id="practiceCanvas" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"></canvas>
-            <canvas id="snapCanvas" style="display:none"></canvas>
-            <div class="cam-status">
-              <div class="cam-dot"></div>
-              <span style="color:var(--t2);font-family:var(--f-sub);font-size:0.8rem">AI Camera &nbsp;·&nbsp; <span style="color:var(--gold-lite)">Live</span></span>
-            </div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:0">
-            <div class="info-card">
-              <h3>How to Practice</h3>
-              <ul class="info-list">
-                <li>Ensure good lighting in your environment</li>
-                <li>Keep your hand clearly within the camera frame</li>
-                <li>Hold each sign position for at least 2 seconds</li>
-                <li>Use the Sign Chat sidebar to compose messages with hand signs</li>
-              </ul>
-            </div>
-            <div class="accuracy-wrap">
-              <div class="accuracy-header">
-                <h3><i class="fas fa-chart-line" style="color:var(--gold);margin-right:8px;font-size:0.9rem"></i>Sign Accuracy</h3>
-                <span class="accuracy-sign-name" id="acc-sign-name">—</span>
-              </div>
-              <div id="acc-idle" class="accuracy-idle">
-                <i class="fas fa-hand-paper" style="font-size:1.6rem;display:block;margin-bottom:7px;color:var(--t3)"></i>
+</div>
+<div class="gesture-grid" id="gesture-grid">
+<div class="lesson-empty" style="grid-column:1/-1">
+<i class="fas fa-hand-pointer"></i>
+<p>Select a category above to explore signs</p>
+</div>
+</div>
+</section>
+<!-- GESTURE MODAL -->
+<div id="gesture-modal">
+<div class="gm-panel">
+<div class="gm-img-wrap">
+<img alt="" id="gm-img" onerror="this.style.display='none';document.getElementById('gm-ph').style.display='flex'" src=""/>
+<div class="gm-img-placeholder" id="gm-ph" style="display:none"><i class="fas fa-hand-paper"></i></div>
+</div>
+<div class="gm-body">
+<div class="gm-label">Hand Sign</div>
+<div class="gm-name" id="gm-name"></div>
+<div class="gm-meaning" id="gm-meaning"></div>
+<button class="gm-close-btn" onclick="closeGestureModal()"><i class="fas fa-times"></i>  Close</button>
+</div>
+</div>
+</div>
+<!-- PRACTICE -->
+<section class="page" id="practice">
+<div class="page-header">
+<h2>Practice Mode</h2>
+<p>Real-time AI detection — show your hand to the camera</p>
+</div>
+<div class="practice-grid">
+<div class="cam-card">
+<!-- Browser-side camera: raw feed (hidden) + overlay canvas -->
+<video autoplay="" id="localVideo" muted="" playsinline="" style="display:none"></video>
+<canvas id="practiceCanvas" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"></canvas>
+<canvas id="snapCanvas" style="display:none"></canvas>
+<div class="cam-status">
+<div class="cam-dot"></div>
+<span style="color:var(--t2);font-family:var(--f-sub);font-size:0.8rem">AI Camera  ·  <span style="color:var(--gold-lite)">Live</span></span>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:0">
+<div class="info-card">
+<h3>How to Practice</h3>
+<ul class="info-list">
+<li>Ensure good lighting in your environment</li>
+<li>Keep your hand clearly within the camera frame</li>
+<li>Hold each sign position for at least 2 seconds</li>
+<li>Keep your hand steady for consistent AI recognition</li>
+</ul>
+</div>
+<div class="accuracy-wrap">
+<div class="accuracy-header">
+<h3><i class="fas fa-chart-line" style="color:var(--gold);margin-right:8px;font-size:0.9rem"></i>Sign Accuracy</h3>
+<span class="accuracy-sign-name" id="acc-sign-name">—</span>
+</div>
+<div class="accuracy-idle" id="acc-idle">
+<i class="fas fa-hand-paper" style="font-size:1.6rem;display:block;margin-bottom:7px;color:var(--t3)"></i>
                 Show your hand to the camera
               </div>
-              <div id="acc-live" style="display:none">
-                <div class="accuracy-pct" id="acc-pct">0%</div>
-                <div class="accuracy-grade" id="acc-grade">Keep Adjusting</div>
-                <div class="accuracy-bar-track" style="margin-top:12px">
-                  <div class="accuracy-bar-fill" id="acc-bar" style="width:0%"></div>
-                </div>
-                <div class="accuracy-labels"><span>0%</span><span>50%</span><span>100%</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+<div id="acc-live" style="display:none">
+<div class="accuracy-pct" id="acc-pct">0%</div>
+<div class="accuracy-grade" id="acc-grade">Keep Adjusting</div>
+<div class="accuracy-bar-track" style="margin-top:12px">
+<div class="accuracy-bar-fill" id="acc-bar" style="width:0%"></div>
+</div>
+<div class="accuracy-labels"><span>0%</span><span>50%</span><span>100%</span></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- QUIZ -->
 
-      <!-- QUIZ -->
-      <section id="quiz" class="page">
-        <div class="page-header">
-          <h2>Knowledge Check</h2>
-          <p>Test what you've learned about sign language</p>
-        </div>
-        <div class="quiz-card" id="quiz-box">
-          <div class="quiz-q" id="q-text"></div>
-          <div class="quiz-options" id="q-options"></div>
-        </div>
-      </section>
+<!-- VIDEO LECTURES -->
 
-      <!-- VIDEO LECTURES -->
-      <section id="video" class="page">
-        <div class="page-header">
-          <h2>Video Lectures</h2>
-          <p>Curated lessons from alphabet to advanced techniques</p>
-        </div>
-        <div class="video-grid" id="videoGrid"></div>
-      </section>
+<!-- GAMES -->
 
-      <!-- GAMES -->
-      <section id="game" class="page">
-        <div class="page-header">
-          <h2>Games</h2>
-          <p>Learn through play — warm up videos, timed challenges, and sentence building</p>
-        </div>
-        <div class="game-tabs">
-          <button class="game-tab-btn active" id="tab-warmup-btn" onclick="switchGameTab('warmup')">
-            <i class="fas fa-fire"></i> Game 1: Warm Up
-          </button>
-          <button class="game-tab-btn" id="tab-signoff-btn" onclick="switchGameTab('signoff')">
-            <i class="fas fa-bolt"></i> Game 2: Sign-Off Challenge
-          </button>
-          <button class="game-tab-btn" id="tab-sentence-btn" onclick="switchGameTab('sentence')">
-            <i class="fas fa-keyboard"></i> Game 3: Sentence Builder
-          </button>
-        </div>
+<!-- ABOUT -->
 
-        <!-- GAME 1: WARM UP -->
-        <div id="game-warmup" class="game-subsection active">
-          <div class="game-header-strip">
-            <div class="game-header-icon">🎮</div>
-            <div class="game-header-text">
-              <h3>Play &amp; Learn</h3>
-              <p>Practice your hand sign knowledge through fun interactive game videos. Watch, mimic, and challenge yourself!</p>
-            </div>
-          </div>
-          <div class="game-grid" id="gameGrid"></div>
-        </div>
-
-        <!-- GAME 2: SIGN-OFF -->
-        <div id="game-signoff" class="game-subsection">
-          <div class="game-header-strip" style="background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(45,212,191,0.04));border-color:rgba(212,175,55,0.18)">
-            <div class="game-header-icon" style="background:linear-gradient(135deg,var(--gold),var(--teal));box-shadow:0 0 40px var(--gold-glow)">⚡</div>
-            <div class="game-header-text">
-              <h3>Timed Sign-Off Challenge</h3>
-              <p>A word flashes on screen — sign it before the timer runs out! Use your camera or self-assess.</p>
-            </div>
-          </div>
-          <div class="signoff-arena">
-            <div class="signoff-main" id="signoff-main">
-              <div class="signoff-idle" id="signoff-idle">
-                <div class="signoff-idle-icon">🤟</div>
-                <h3>Ready to Sign?</h3>
-                <p>Words flash on screen one by one. Sign each before the 5-second timer runs out!</p>
-              </div>
-              <div class="signoff-active" id="signoff-active" style="display:none">
-                <div style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px">
-                  <div style="flex:1">
-                    <div class="signoff-hint">Sign this word:</div>
-                    <div class="signoff-word-wrap"><div class="signoff-word" id="signoff-word">HELLO</div></div>
-                  </div>
-                  <div class="signoff-timer-wrap">
-                    <svg class="signoff-timer-svg" viewBox="0 0 100 100">
-                      <circle class="signoff-timer-bg" cx="50" cy="50" r="45"/>
-                      <circle class="signoff-timer-arc" id="signoff-arc" cx="50" cy="50" r="45"/>
-                    </svg>
-                    <div class="signoff-timer-text" id="signoff-timer-text">5</div>
-                  </div>
-                </div>
-                <div class="signoff-feedback" id="signoff-feedback"></div>
-                <div style="width:100%">
-                  <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:var(--t3);margin-bottom:6px;letter-spacing:0.08em;text-transform:uppercase;font-family:var(--f-sub)">
-                    <span>Progress</span><span id="signoff-progress-label">0 / 10</span>
-                  </div>
-                  <div class="signoff-progress-bar-wrap"><div class="signoff-progress-bar-fill" id="signoff-progress-bar" style="width:0%"></div></div>
-                </div>
-              </div>
-              <div class="signoff-result" id="signoff-result" style="display:none">
-                <div class="signoff-result-icon" id="result-icon">🎉</div>
-                <h3 id="result-title">Round Complete!</h3>
-                <div class="score-big" id="result-score">7 / 10</div>
-                <p id="result-msg">Great effort!</p>
-              </div>
-            </div>
-
-            <div class="signoff-side">
-              <div class="signoff-cam-card" id="signoff-cam-card" style="display:none">
-                <div class="signoff-cam-header"><div class="cam-dot"></div><span>Live Camera</span></div>
-                <div class="signoff-cam-wrap">
-                  <video id="signoffCamFeed" autoplay playsinline muted style="display:none"></video>
-                  <canvas id="signoffCanvas" style="width:100%;height:100%;object-fit:cover;display:block"></canvas>
-                  <div class="signoff-cam-badge" id="signoff-cam-badge">No sign detected</div>
-                  <div class="signoff-cam-result" id="signoff-cam-result">
-                    <span id="signoff-cam-result-emoji"></span>
-                    <span class="signoff-cam-result-label" id="signoff-cam-result-label"></span>
-                  </div>
-                </div>
-              </div>
-              <div class="signoff-score-card">
-                <h4>📊 Session Stats</h4>
-                <div class="score-row"><span>Correct</span><span class="score-val green" id="stat-correct">0</span></div>
-                <div class="score-row"><span>Missed</span><span class="score-val red" id="stat-missed">0</span></div>
-                <div class="score-row"><span>Round</span><span class="score-val cyan" id="stat-round">—</span></div>
-                <div class="score-row"><span>Best Score</span><span class="score-val cyan" id="stat-best">—</span></div>
-              </div>
-              <div class="signoff-controls">
-                <button class="signoff-btn signoff-btn-start" id="signoff-start-btn" onclick="startSignoffGame()"><i class="fas fa-play"></i> Start Game</button>
-                <button class="signoff-btn signoff-btn-self" id="signoff-got-btn" onclick="signoffMarkCorrect()" style="display:none"><i class="fas fa-check"></i> I Signed It! ✓</button>
-                <button class="signoff-btn signoff-btn-stop" id="signoff-stop-btn" onclick="stopSignoffGame()" style="display:none"><i class="fas fa-stop"></i> Stop Game</button>
-              </div>
-              <div class="signoff-howto">
-                <strong><i class="fas fa-circle-info" style="color:var(--gold);margin-right:5px"></i>How to Play</strong>
-                <ul style="margin:0;padding-left:16px">
-                  <li>A word appears on screen</li>
-                  <li>You have <strong>5 seconds</strong> to sign it</li>
-                  <li>Camera detects sign automatically</li>
-                  <li>Or click <em>"I Signed It!"</em> to self-assess</li>
-                  <li>10 words per round</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ============================================================
-             GAME 3: SENTENCE BUILDER
-             ============================================================ -->
-        <div id="game-sentence" class="game-subsection">
-          <div class="game-header-strip" style="background:linear-gradient(135deg,rgba(45,212,191,0.08),rgba(139,92,246,0.05));border-color:rgba(45,212,191,0.18)">
-            <div class="game-header-icon" style="background:linear-gradient(135deg,var(--teal),var(--violet));box-shadow:0 0 40px var(--teal-glow)">✍️</div>
-            <div class="game-header-text">
-              <h3>Sentence Builder</h3>
-              <p>Form words and sentences entirely with hand signs. Hold any sign steady for <strong style="color:var(--teal)">1 second</strong> to add it. Special signs trigger Space, Backspace, Speak &amp; Copy.</p>
-            </div>
-          </div>
-
-          <div class="sb-arena">
-
-            <!-- LEFT: Camera + legend -->
-            <div class="sb-cam-col">
-
-              <!-- Camera with hold-ring overlay -->
-              <div class="sb-cam-wrap" id="sb-cam-wrap">
-                <video id="sbVideo" autoplay playsinline muted style="display:none"></video>
-                <canvas id="sbCamFeed" style="width:100%;height:100%;display:block;border-radius:12px"></canvas>
-
-                <!-- SVG hold-arc ring -->
-                <div class="sb-hold-ring">
-                  <svg class="sb-hold-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                    <circle class="sb-hold-bg-circle" cx="50" cy="50" r="44"/>
-                    <circle class="sb-hold-arc" id="sb-hold-arc" cx="50" cy="50" r="44"/>
-                  </svg>
-                </div>
-
-                <!-- Big detected sign badge top-right -->
-                <div class="sb-sign-big" id="sb-sign-big">—</div>
-
-                <!-- Bottom badge -->
-                <div class="sb-cam-badge" id="sb-cam-badge">No sign detected</div>
-              </div>
-
-              <!-- Hold progress bar -->
-              <div class="sb-hold-bar-wrap">
-                <div class="sb-hold-bar-fill" id="sb-hold-bar"></div>
-              </div>
-
-              <!-- Status row -->
-              <div class="sb-status-row">
-                <div class="sb-status-dot off" id="sb-status-dot"></div>
-                <span id="sb-status-text">Start the game to begin detecting signs</span>
-              </div>
-
-              <!-- Special sign legend -->
-              <div class="sb-legend-card">
-                <div class="sb-legend-title"><i class="fas fa-info-circle" style="color:var(--teal);margin-right:6px"></i>Special Sign Commands</div>
-                <div class="sb-legend-grid">
-                  <div class="sb-legend-item">
-                    <span class="sb-legend-key">SPACE</span>
-                    <span class="sb-legend-desc">Add space</span>
-                  </div>
-                  <div class="sb-legend-item">
-                    <span class="sb-legend-key">DEL</span>
-                    <span class="sb-legend-desc">Backspace</span>
-                  </div>
-                  <div class="sb-legend-item">
-                    <span class="sb-legend-key">SPEAK</span>
-                    <span class="sb-legend-desc">Read aloud</span>
-                  </div>
-                  <div class="sb-legend-item">
-                    <span class="sb-legend-key">COPY</span>
-                    <span class="sb-legend-desc">Copy text</span>
-                  </div>
-                  <div class="sb-legend-item" style="grid-column:1/-1">
-                    <span class="sb-legend-key" style="min-width:unset;padding:2px 6px">A–Z</span>
-                    <span class="sb-legend-desc">Hold 1s → appends letter to sentence</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Tip -->
-              <div class="sb-tip-card">
-                <strong><i class="fas fa-lightbulb" style="color:var(--teal)"></i> Pro Tips</strong>
-                After adding a letter, <em>change your hand sign</em> before signing the same letter again — this prevents accidental repeats. Use the buttons below the sentence as instant fallbacks.
-              </div>
-
-            </div><!-- /sb-cam-col -->
-
-            <!-- RIGHT: Sentence + controls -->
-            <div class="sb-text-col">
-
-              <!-- Sentence display panel -->
-              <div class="sb-sentence-panel">
-                <div class="sb-toast" id="sb-toast"></div>
-                <div class="sb-sentence-label">
-                  <i class="fas fa-pen-nib" style="color:var(--teal);margin-right:6px"></i>Your Sentence
-                </div>
-                <div class="sb-sentence-text" id="sb-sentence-text">
-                  <span id="sb-text-content"></span><span class="sb-cursor" id="sb-cursor"></span>
-                </div>
-                <div class="sb-sentence-word-count" id="sb-word-count">0 characters · 0 words</div>
-              </div>
-
-              <!-- Action buttons (manual fallbacks) -->
-              <div class="sb-actions">
-                <button class="sb-act-btn sb-btn-space" onclick="sbAction('space')" title="Add Space">
-                  <i class="fas fa-grip-lines"></i>Space
-                </button>
-                <button class="sb-act-btn sb-btn-back" onclick="sbAction('backspace')" title="Backspace">
-                  <i class="fas fa-backspace"></i>Back
-                </button>
-                <button class="sb-act-btn sb-btn-speak" onclick="sbAction('speak')" title="Speak text aloud">
-                  <i class="fas fa-volume-up"></i>Speak
-                </button>
-                <button class="sb-act-btn sb-btn-copy" onclick="sbAction('copy')" title="Copy to clipboard">
-                  <i class="fas fa-copy"></i>Copy
-                </button>
-                <button class="sb-act-btn sb-btn-clear" onclick="sbAction('clear')" title="Clear all text">
-                  <i class="fas fa-trash-alt"></i>Clear
-                </button>
-              </div>
-
-              <!-- Session stats bar -->
-              <div class="sb-stats-card">
-                <div class="sb-stat">
-                  <div class="sb-stat-val" id="sb-stat-signs">0</div>
-                  <div class="sb-stat-lbl">Signs Added</div>
-                </div>
-                <div class="sb-stat">
-                  <div class="sb-stat-val" id="sb-stat-words">0</div>
-                  <div class="sb-stat-lbl">Words</div>
-                </div>
-                <div class="sb-stat">
-                  <div class="sb-stat-val" id="sb-stat-chars">0</div>
-                  <div class="sb-stat-lbl">Characters</div>
-                </div>
-                <div class="sb-stat">
-                  <div class="sb-stat-val" id="sb-stat-cmds">0</div>
-                  <div class="sb-stat-lbl">Commands</div>
-                </div>
-              </div>
-
-              <!-- Start / Stop controls -->
-              <div class="sb-controls">
-                <button class="sb-start-btn" id="sb-start-btn" onclick="startSentenceBuilder()">
-                  <i class="fas fa-play"></i> Start Sentence Builder
-                </button>
-                <button class="sb-stop-btn" id="sb-stop-btn" onclick="stopSentenceBuilder()">
-                  <i class="fas fa-stop"></i> Stop
-                </button>
-              </div>
-
-              <!-- How-to card -->
-              <div class="sb-tip-card" style="border-color:rgba(212,175,55,0.12)">
-                <strong><i class="fas fa-circle-info" style="color:var(--gold)"></i> How It Works</strong>
-                <ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
-                  <li>Press <em>Start</em> — your camera activates</li>
-                  <li>Show any hand sign (A–Z or special)</li>
-                  <li>The gold arc fills as you hold steady</li>
-                  <li>At <strong>1 second</strong> → sign is appended automatically</li>
-                  <li>Change sign before repeating the same letter</li>
-                  <li>Use <em>SPACE / DEL / SPEAK / COPY</em> signs or the buttons</li>
-                </ol>
-              </div>
-
-            </div><!-- /sb-text-col -->
-          </div><!-- /sb-arena -->
-        </div><!-- /game-sentence -->
-
-      </section>
 
       <!-- ABOUT -->
       <section id="about" class="page">
         <div class="page-header">
-          <h2>About the Project</h2>
+          <h2>Project Info</h2>
           <p>Mission, technology, and purpose</p>
         </div>
         <div class="about-card">
-          <p>The Hand Sign Learning and Recognition System is designed to foster connections where spoken words are limited, offering a channel for genuine expression and understanding. This system empowers individuals who are exploring the nuances of hand-based communication, enabling them to grasp subtle gestures and their intended meanings through an interactive, AI-powered interface.</p>
+          <p>The SIGN VERSE is designed to foster connections where spoken words are limited, offering a channel for genuine expression and understanding. This system empowers individuals who are exploring the nuances of hand-based communication, enabling them to grasp subtle gestures and their intended meanings through an interactive, AI-powered interface.</p>
           <div class="tech-chips">
             <span class="tech-chip"><i class="fas fa-flask"></i>Flask</span>
             <span class="tech-chip"><i class="fas fa-eye"></i>OpenCV</span>
@@ -1327,77 +1055,24 @@ html, body { height: 100%; background: var(--navy); color: var(--t1); font-famil
         </div>
       </section>
 
-    </main>
-  </div>
+</main>
 </div>
-
+</div>
 <!-- ==================== FLOATING CHAT ==================== -->
-<button id="chat-toggle" onclick="toggleChat()" title="Sign Chat"><i class="fas fa-comments"></i></button>
 
-<div id="chat-sidebar">
-  <div class="chat-header">
-    <h3><i class="fas fa-hand-point-up" style="color:var(--gold);font-size:0.95rem"></i> Sign Chat</h3>
-    <button class="chat-close-btn" onclick="toggleChat()"><i class="fas fa-times"></i></button>
-  </div>
-  <div id="chat-camera-wrap">
-    <canvas id="chatCanvas" style="width:100%;height:100%;display:block;border-radius:8px"></canvas>
-    <div id="cameraSignBadge">No sign detected</div>
-    <div id="holdProgress"></div>
-  </div>
-  <div id="chat-messages">
-    <div class="msg bot">
-      <span class="msg-label">AI Assistant</span>
-      <div class="msg-bubble">👋 Hi! Show your hand sign to the camera. Hold steady for 1.5s to add it to your message, then click <strong>Submit</strong>!</div>
-    </div>
-  </div>
-  <div class="compose-section">
-    <div class="compose-label">Composing message</div>
-    <div class="text-compose-area" id="composeText"></div>
-    <div class="compose-btns">
-      <button class="compose-btn btn-submit" onclick="submitChat()"><i class="fas fa-paper-plane"></i>Submit</button>
-      <button class="compose-btn btn-space" onclick="addSpace()"><i class="fas fa-grip-lines"></i>Space</button>
-      <button class="compose-btn btn-addsign" onclick="addCurrentSign()"><i class="fas fa-hand-point-up"></i>Add Sign</button>
-      <button class="compose-btn btn-clear" onclick="clearCompose()"><i class="fas fa-backspace"></i>Clear</button>
-    </div>
-    <div class="detection-status">
-      <div class="status-dot inactive" id="statusDot"></div>
-      <span id="detectionStatus">Open chat to detect signs...</span>
-    </div>
-  </div>
-</div>
 
 <!-- ==================== TOUR ==================== -->
+
+
+<!-- ==================== VIDEO MODAL ==================== -->
+
+
+<!-- INTRODUCTION / TOUR -->
 <div id="tour-backdrop"></div>
 <div id="tour-ring"></div>
 <div id="tour-panel">
-  <div class="tp-header">
-    <div class="tp-badge"><div class="tp-badge-num" id="tp-step-num">1</div><span id="tp-step-label">Overview</span></div>
-    <button class="tp-close" onclick="closeTour()"><i class="fas fa-times"></i></button>
-  </div>
-  <div class="tp-body">
-    <div class="tp-icon" id="tp-icon">🤖</div>
-    <h2 class="tp-title" id="tp-title">Welcome</h2>
-    <p class="tp-desc" id="tp-desc"></p>
-    <div class="tp-chips" id="tp-chips"></div>
-    <div class="tp-dots" id="tp-dots"></div>
-    <div class="tp-nav">
-      <button class="tp-btn tp-btn-prev" id="tp-prev" onclick="tourNav(-1)"><i class="fas fa-chevron-left"></i> Back</button>
-      <button class="tp-btn tp-btn-next" id="tp-next" onclick="tourNav(1)">Next <i class="fas fa-chevron-right"></i></button>
-    </div>
-  </div>
-</div>
-
-<!-- ==================== VIDEO MODAL ==================== -->
-<div id="video-modal">
-  <div class="video-modal-inner">
-    <div class="video-modal-header">
-      <h3 id="modal-video-title"><i class="fas fa-play-circle" style="margin-right:8px;color:var(--gold)"></i>Now Playing</h3>
-      <button class="modal-close-btn" onclick="closeVideoModal()"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="video-embed-wrap">
-      <iframe id="modal-iframe" src="" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
-    </div>
-  </div>
+<div class="tp-header"><div class="tp-badge"><div class="tp-badge-num" id="tp-step-num">1</div><span id="tp-step-label">Welcome</span></div><button class="tp-close" onclick="closeTour()"><i class="fas fa-times"></i></button></div>
+<div class="tp-body"><div class="tp-icon" id="tp-icon">🤖</div><h2 class="tp-title" id="tp-title">Welcome to SIGN VERSE</h2><p class="tp-desc" id="tp-desc"></p><div class="tp-chips" id="tp-chips"></div><div class="tp-dots" id="tp-dots"></div><div class="tp-nav"><button class="tp-btn tp-btn-prev" id="tp-prev" onclick="tourNav(-1)"><i class="fas fa-chevron-left"></i> Back</button><button class="tp-btn tp-btn-next" id="tp-next" onclick="tourNav(1)">Next <i class="fas fa-chevron-right"></i></button></div></div>
 </div>
 
 <!-- ==================== SCRIPTS ==================== -->
@@ -1438,25 +1113,30 @@ function initApp() {
   w.addEventListener('transitionend', () => {
     w.style.display = 'none';
     a.style.display = 'block';
-    buildVideoGrid(); buildGameGrid();
-    setTimeout(() => startTour(), 600);
   }, {once:true});
 }
 
 function showPage(pageId, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-  document.getElementById(pageId).classList.add('active');
-  el.classList.add('active');
-  if (pageId === 'quiz') { currentQ = 0; score = 0; loadQuiz(); }
+
+  const page = document.getElementById(pageId);
+  if (!page) return;
+
+  page.classList.add('active');
+  if (el) el.classList.add('active');
+
   if (pageId === 'lesson' && !lessonLoaded) {
     lessonLoaded = true;
     loadCategory('alphabets', document.getElementById('ltab-alphabets'));
   }
-  if (pageId === 'practice') startAccuracyPolling();
-  else { stopAccuracyPolling(); resetAccuracyUI(); }
-  // Stop sentence builder when leaving games
-  if (pageId !== 'game') stopSentenceBuilder();
+
+  if (pageId === 'practice') {
+    startAccuracyPolling();
+  } else {
+    stopAccuracyPolling();
+    resetAccuracyUI();
+  }
 }
 let lessonLoaded = false;
 
@@ -2141,218 +1821,24 @@ function stopSentenceBuilder() {
 /* ====================================================
    VIDEO MODAL
    ==================================================== */
-function openVideoModal(vid,title){
-  document.getElementById('modal-video-title').innerHTML=`<i class="fas fa-play-circle" style="margin-right:8px;color:var(--gold)"></i>${title}`;
-  document.getElementById('modal-iframe').src=`https://www.youtube.com/embed/${vid}?autoplay=1&rel=0`;
-  document.getElementById('video-modal').classList.add('open');
-}
-function closeVideoModal(){
-  document.getElementById('video-modal').classList.remove('open');
-  setTimeout(()=>{document.getElementById('modal-iframe').src=''},400);
-}
-document.getElementById('video-modal').addEventListener('click',function(e){if(e.target===this)closeVideoModal()});
-
 /* ====================================================
-   CHAT
-   ==================================================== */
-let chatOpen=false,composeText='',currentDetectedSign='',lastAppendedSign='';
-const HOLD_MS=1500;
-let holdStart=null,holdLabel='',holdRAF=null,signNeedsReset=false,lastAddedLabel='';
-
-function toggleChat(){
-  chatOpen=!chatOpen;
-  document.getElementById('chat-sidebar').classList.toggle('open',chatOpen);
-  document.getElementById('chat-toggle').querySelector('i').className=chatOpen?'fas fa-times':'fas fa-comments';
-  if(chatOpen){
-    startBrowserCamera();
-    paintLoop('chatCanvas', 'localVideo');
-    startSignPolling();
-    document.getElementById('statusDot').classList.remove('inactive');
-    document.getElementById('detectionStatus').textContent='Camera active, show your hand...';
-  }else{
-    stopSignPolling();stopHold();
-    document.getElementById('statusDot').classList.add('inactive');
-    document.getElementById('detectionStatus').textContent='Open chat to detect signs...';
-  }
-}
-let pollInterval=null;
-function startSignPolling(){if(pollInterval)clearInterval(pollInterval);pollInterval=setInterval(pollSign,500)}
-function stopSignPolling(){if(pollInterval){clearInterval(pollInterval);pollInterval=null}}
-async function pollSign(){
-  try{const c=new AbortController();const t=setTimeout(()=>c.abort(),450);
-    const r=await fetch('/current_sign',{signal:c.signal});clearTimeout(t);
-    if(r.ok){const d=await r.json();handleDetected(d.label||'')}
-  }catch(e){}
-}
-function handleDetected(label){
-  if(!label){if(signNeedsReset)signNeedsReset=false;if(holdLabel)stopHold();updateBadge('No sign detected',false);return}
-  if(signNeedsReset&&label===lastAddedLabel){stopHold();updateBadge('✓ '+label+' added',true);document.getElementById('detectionStatus').textContent=`"${label}" added — change sign`;document.getElementById('holdProgress').style.width='0%';return}
-  if(label!==lastAddedLabel)signNeedsReset=false;
-  updateBadge('Sign: '+label,true);currentDetectedSign=label;
-  document.getElementById('detectionStatus').textContent=`Detected: "${label}" — hold to add`;
-  if(label===holdLabel){}else{stopHold();holdLabel=label;holdStart=performance.now();animateHold()}
-}
-function animateHold(){
-  holdRAF=requestAnimationFrame(()=>{
-    if(!holdStart||!holdLabel)return;
-    const e=performance.now()-holdStart,p=Math.min((e/HOLD_MS)*100,100);
-    document.getElementById('holdProgress').style.width=p+'%';
-    if(p>=100){appendSign(holdLabel);holdLabel='';holdStart=null;document.getElementById('holdProgress').style.width='0%'}
-    else animateHold();
-  });
-}
-function stopHold(){holdLabel='';holdStart=null;if(holdRAF){cancelAnimationFrame(holdRAF);holdRAF=null}document.getElementById('holdProgress').style.width='0%'}
-function updateBadge(t,a){const b=document.getElementById('cameraSignBadge');b.textContent=t;b.style.color=a?'var(--gold-lite)':'#64748b';b.style.borderColor=a?'rgba(212,175,55,0.3)':'rgba(255,255,255,0.08)'}
-function appendSign(label){
-  if(!label)return;
-  const alpha=label.length===1&&label.match(/[A-Z]/i);
-  if(alpha)composeText+=label;else{if(composeText&&!composeText.endsWith(' '))composeText+=' ';composeText+=label}
-  renderCompose();lastAddedLabel=label;signNeedsReset=true;
-  const b=document.getElementById('cameraSignBadge');b.style.color='#34d399';b.style.borderColor='#34d399';
-  setTimeout(()=>updateBadge('Sign: '+label,true),500);
-  document.getElementById('detectionStatus').textContent=`"${label}" added! Change sign to continue`;
-}
-function addCurrentSign(){
-  if(currentDetectedSign){stopHold();appendSign(currentDetectedSign);}
-  else{document.getElementById('detectionStatus').textContent='No sign detected yet — show your hand!';}
-}
-function addSpace(){composeText+=' ';renderCompose()}
-function clearCompose(){composeText='';signNeedsReset=false;lastAddedLabel='';renderCompose()}
-function renderCompose(){document.getElementById('composeText').textContent=composeText}
-async function submitChat(){
-  const t=composeText.trim();if(!t)return;
-  addMsg('user',t);composeText='';signNeedsReset=false;lastAddedLabel='';renderCompose();
-  showTyping();const r=await getReply(t);hideTyping();addMsg('bot',r);scrollChat();
-}
-function addMsg(role,text){
-  const c=document.getElementById('chat-messages');
-  const m=document.createElement('div');m.className='msg '+role;
-  m.innerHTML=`<span class="msg-label">${role==='user'?'You':'AI Assistant'}</span><div class="msg-bubble">${role==='user'?escHtml(text):text}</div>`;
-  c.appendChild(m);scrollChat();
-}
-let typingEl=null;
-function showTyping(){
-  const c=document.getElementById('chat-messages');typingEl=document.createElement('div');typingEl.className='msg bot';
-  typingEl.innerHTML=`<span class="msg-label">AI Assistant</span><div class="msg-bubble"><div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
-  c.appendChild(typingEl);scrollChat();
-}
-function hideTyping(){if(typingEl){typingEl.remove();typingEl=null}}
-function scrollChat(){const c=document.getElementById('chat-messages');c.scrollTop=c.scrollHeight}
-function escHtml(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-const RULES=[
-  {m:/\b(hello|hi|hey|namaste)\b/i,r:["👋 Hello! Great to see you signing!","Hi there! Your skills are coming along! 😊"]},
-  {m:/\b(bye|goodbye)\b/i,r:["👋 Goodbye! Keep practicing!","See you! Practice makes perfect!"]},
-  {m:/\b(thank|thanks)\b/i,r:["🙏 You're welcome!","Anytime! Keep signing!"]},
-  {m:/\b(yes|yeah|ok)\b/i,r:["✅ Absolutely!","Great! 👍"]},
-  {m:/\b(no|nope)\b/i,r:["That's okay! Try again! 💪","No worries — keep learning."]},
-  {m:/\b(help|assist)\b/i,r:["🤝 Try Practice Mode or Learning Lab!","Happy to help! Explore the sidebar!"]},
-  {m:/\b(like|love|great|awesome)\b/i,r:["😄 Wonderful to hear!","That's the spirit! 🚀"]},
-  {m:/\b(project)\b/i,r:["🎓 Built with Flask, OpenCV & Keras!","Developed by Divyanshu Sharma at Graphic Era University!"]}
-];
-const DEFAULTS=["Keep practicing! 🤙","Got me! What else would you like to sign?","Your signs are getting clearer! 💙","Interesting! Tell me more."];
-function getReply(text){
-  return new Promise(res=>{
-    setTimeout(()=>{
-      for(const rule of RULES){if(rule.m.test(text)){const r=rule.r;res(r[Math.floor(Math.random()*r.length)]);return}}
-      res(DEFAULTS[Math.floor(Math.random()*DEFAULTS.length)]);
-    },600+Math.random()*700);
-  });
-}
-document.addEventListener('keydown',e=>{
-  if(!chatOpen)return;
-  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submitChat()}
-});
-
-/* ====================================================
-   TOUR GUIDE
+   INTRODUCTION / TOUR
    ==================================================== */
 const TOUR_STEPS=[
-  {targetId:null,label:'Welcome',icon:'🤖',title:'Welcome to Hand Sign Learning & Recognition System',desc:'This app uses real-time computer vision to help you learn and practice sign language. Let\'s take a quick tour of every feature.',chips:[{icon:'fa-camera',text:'Live AI camera'},{icon:'fa-brain',text:'Deep learning'},{icon:'fa-comments',text:'Sign-to-chat'}]},
-  {targetId:'sidebar',label:'Navigation',icon:'🗂️',title:'Navigation Sidebar',desc:'Your main navigation lives on the left. Hover to expand and reveal all section names. Click any item to switch pages.',chips:[{icon:'fa-mouse-pointer',text:'Hover to expand'},{icon:'fa-exchange-alt',text:'Switch pages'}]},
-  {targetId:'nav-developer',label:'Dev Profile',icon:'👨‍💻',title:'Developer Details',desc:'Shows the profile of the developer — Divyanshu Sharma from Graphic Era University, BCA AI & Data Science.',chips:[{icon:'fa-university',text:'Graphic Era'},{icon:'fa-graduation-cap',text:'BCA AI & DS'}]},
-  {targetId:'nav-lesson',label:'Learning Lab',icon:'📚',title:'Learning Lab',desc:'Browse the sign library. Click any sign card to see its image and meaning in a detail panel.',chips:[{icon:'fa-font',text:'A–Z alphabets'},{icon:'fa-hand-paper',text:'Basic signs'},{icon:'fa-mouse-pointer',text:'Click cards!'}]},
-  {targetId:'nav-practice',label:'Live Camera',icon:'🎥',title:'Practice Mode',desc:'Your webcam streams in real time. The AI model analyzes your hand and shows a live accuracy score below the tips.',chips:[{icon:'fa-lightbulb',text:'Good lighting'},{icon:'fa-chart-line',text:'Accuracy meter'},{icon:'fa-microchip',text:'CNN running'}]},
-  {targetId:'nav-quiz',label:'Quiz',icon:'🧪',title:'Knowledge Check',desc:'Test what you\'ve learned! 20 questions covering alphabets, common signs, and technique.',chips:[{icon:'fa-list-ol',text:'20 questions'},{icon:'fa-check-circle',text:'Instant feedback'},{icon:'fa-redo',text:'Retake anytime'}]},
-  {targetId:'nav-video',label:'Videos',icon:'🎬',title:'Video Lectures',desc:'8 curated sign language lessons. Click any card to open a full embedded player.',chips:[{icon:'fa-play-circle',text:'8 lessons'},{icon:'fa-expand',text:'Full screen'},{icon:'fa-graduation-cap',text:'Structured'}]},
-  {targetId:'nav-game',label:'Games',icon:'🎮',title:'Games',desc:'Three games! Warm Up, Timed Sign-Off Challenge, and the new Sentence Builder where you type with your hands!',chips:[{icon:'fa-fire',text:'Warm Up'},{icon:'fa-bolt',text:'Sign-Off'},{icon:'fa-keyboard',text:'Sentence Builder'}]},
-  {targetId:'nav-about',label:'About',icon:'ℹ️',title:'Project Info',desc:'Learn the mission behind this project — bridging communication through AI-powered sign language recognition.',chips:[{icon:'fa-flask',text:'Flask'},{icon:'fa-eye',text:'OpenCV'},{icon:'fa-brain',text:'Keras CNN'}]},
-  {targetId:'chat-toggle',label:'Sign Chat',icon:'💬',title:'Sign Chat',desc:'Opens the Sign Chat sidebar. Hold any hand sign steady for 1.5 seconds to add it to your message.',chips:[{icon:'fa-camera',text:'Camera'},{icon:'fa-hand-point-up',text:'Add Sign btn'},{icon:'fa-paper-plane',text:'Submit'}]},
-  {targetId:'nav-intro',label:'Done!',icon:'🎉',title:"You're All Set!",desc:"This tour is always available from the sidebar. Now go explore — practice signs, watch lectures, play games!",chips:[{icon:'fa-compass',text:'Relaunch'},{icon:'fa-star',text:'Ready!'},{icon:'fa-rocket',text:'Go!'}]}
-];
+{targetId:null,label:'Welcome',icon:'🤖',title:'Welcome to SIGN VERSE',desc:'SIGN VERSE helps you learn and practice sign language using an interactive learning library and real-time AI-powered hand sign recognition.',chips:[{icon:'fa-brain',text:'AI recognition'},{icon:'fa-book-open',text:'Learning Lab'},{icon:'fa-camera',text:'Live Practice'}]},
+{targetId:'nav-developer',label:'Developer',icon:'👨‍💻',title:'Developer',desc:'Meet the Signova Team behind SIGN VERSE and learn about the project creators.',chips:[{icon:'fa-users',text:'Signova Team'},{icon:'fa-graduation-cap',text:'BCA Students'}]},
+{targetId:'nav-lesson',label:'Learning Lab',icon:'📚',title:'Learning Lab',desc:'Explore the available sign-language learning sets. Select a category and click a sign card to view its gesture in detail.',chips:[{icon:'fa-font',text:'Alphabets A–Z'},{icon:'fa-hand-paper',text:'Digits'},{icon:'fa-mouse-pointer',text:'Interactive cards'}]},
+{targetId:'nav-practice',label:'Practice Mode',icon:'🎥',title:'Practice Mode',desc:'Use your webcam to practice signs while the AI model recognizes your hand sign and displays the current prediction and accuracy.',chips:[{icon:'fa-camera',text:'Live camera'},{icon:'fa-chart-line',text:'Accuracy meter'},{icon:'fa-microchip',text:'AI model'}]},
+{targetId:'nav-about',label:'Project Info',icon:'ℹ️',title:'Project Info',desc:'Read about the purpose of SIGN VERSE and the main technologies used to build the project.',chips:[{icon:'fa-flask',text:'Flask'},{icon:'fa-eye',text:'OpenCV'},{icon:'fa-brain',text:'Keras / TFLite'}]},
+{targetId:'nav-intro',label:'Done!',icon:'🎉',title:'You’re All Set!',desc:'You can open this Introduction tour anytime from the sidebar. Start with Learning Lab, then move to Practice Mode.',chips:[{icon:'fa-compass',text:'Introduction'},{icon:'fa-star',text:'Keep learning'},{icon:'fa-rocket',text:'Start practicing'}]}];
 let tourIdx=0,tourOpen=false;
-
-function startTour(){
-  tourIdx=0;tourOpen=true;
-  const bd=document.getElementById('tour-backdrop'),p=document.getElementById('tour-panel'),r=document.getElementById('tour-ring');
-  p.style.opacity='';p.style.transform='';p.classList.remove('panel-visible');r.classList.remove('ring-visible');
-  bd.classList.add('tour-open');_renderStep(tourIdx);
-  setTimeout(()=>p.classList.add('panel-visible'),50);
-}
-function closeTour(){
-  tourOpen=false;
-  const bd=document.getElementById('tour-backdrop'),p=document.getElementById('tour-panel'),r=document.getElementById('tour-ring');
-  p.style.opacity='';p.style.transform='';p.classList.remove('panel-visible');r.classList.remove('ring-visible');
-  setTimeout(()=>bd.classList.remove('tour-open'),340);
-}
-function tourNav(dir){
-  if(!tourOpen)return;const ni=tourIdx+dir;if(ni<0||ni>=TOUR_STEPS.length)return;
-  const p=document.getElementById('tour-panel');
-  p.style.opacity='0';p.style.transform=dir>0?'scale(0.94) translateX(18px)':'scale(0.94) translateX(-18px)';
-  setTimeout(()=>{tourIdx=ni;_renderStep(tourIdx);p.style.opacity='1';p.style.transform='scale(1) translateX(0)'},210);
-}
-function tourJump(i){
-  if(!tourOpen||i===tourIdx)return;const dir=i>tourIdx?1:-1;
-  const p=document.getElementById('tour-panel');
-  p.style.opacity='0';p.style.transform=dir>0?'scale(0.94) translateX(18px)':'scale(0.94) translateX(-18px)';
-  setTimeout(()=>{tourIdx=i;_renderStep(tourIdx);p.style.opacity='1';p.style.transform='scale(1) translateX(0)'},210);
-}
-function _renderStep(i){
-  const s=TOUR_STEPS[i],n=TOUR_STEPS.length;
-  document.getElementById('tp-step-num').textContent=i+1;
-  document.getElementById('tp-step-label').textContent=s.label;
-  document.getElementById('tp-icon').textContent=s.icon;
-  document.getElementById('tp-title').textContent=s.title;
-  document.getElementById('tp-desc').textContent=s.desc;
-  document.getElementById('tp-chips').innerHTML=s.chips.map(c=>`<div class="tp-chip"><i class="fas ${c.icon}"></i>${c.text}</div>`).join('');
-  document.getElementById('tp-dots').innerHTML=TOUR_STEPS.map((_,j)=>{
-    let c='tp-dot';if(j===i)c+=' tp-dot-active';else if(j<i)c+=' tp-dot-done';
-    return `<div class="${c}" onclick="tourJump(${j})" title="Step ${j+1}"></div>`;
-  }).join('');
-  document.getElementById('tp-prev').disabled=(i===0);
-  const nb=document.getElementById('tp-next');
-  if(i===n-1){nb.className='tp-btn tp-btn-finish';nb.innerHTML='<i class="fas fa-check"></i> Finish';nb.onclick=closeTour}
-  else{nb.className='tp-btn tp-btn-next';nb.innerHTML='Next <i class="fas fa-chevron-right"></i>';nb.onclick=()=>tourNav(1)}
-  _positionTour(s);
-}
-function _positionTour(step){
-  const ring=document.getElementById('tour-ring'),panel=document.getElementById('tour-panel');
-  const PW=374,PH=460,M=18,PAD=10,vw=window.innerWidth,vh=window.innerHeight;
-  if(step.targetId){
-    const el=document.getElementById(step.targetId);
-    if(el){
-      const r=el.getBoundingClientRect();
-      ring.style.left=(r.left-PAD)+'px';ring.style.top=(r.top-PAD)+'px';
-      ring.style.width=(r.width+PAD*2)+'px';ring.style.height=(r.height+PAD*2)+'px';
-      ring.style.borderRadius=step.targetId==='sidebar'?'0 14px 14px 0':'12px';
-      ring.classList.add('ring-visible');
-      let l,t;const sr=vw-r.right-M,sl=r.left-M,sb=vh-r.bottom-M;
-      if(sr>=PW+M){l=r.right+M;t=Math.max(M,Math.min(r.top,vh-PH-M));}
-      else if(sl>=PW+M){l=r.left-PW-M;t=Math.max(M,Math.min(r.top,vh-PH-M));}
-      else if(sb>=PH+M){l=Math.max(M,Math.min(r.left,vw-PW-M));t=r.bottom+M;}
-      else{l=(vw-PW)/2;t=(vh-PH)/2;}
-      l=Math.max(M,Math.min(l,vw-PW-M));t=Math.max(M,Math.min(t,vh-PH-M));
-      panel.style.left=l+'px';panel.style.top=t+'px';return;
-    }
-  }
-  ring.classList.remove('ring-visible');
-  panel.style.left=((vw-PW)/2)+'px';panel.style.top=((vh-PH)/2)+'px';
-}
-document.getElementById('tour-backdrop').addEventListener('click',function(e){if(e.target===this)closeTour()});
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){if(tourOpen){closeTour();return}closeVideoModal()}
-  if(!tourOpen)return;if(e.key==='ArrowRight')tourNav(1);if(e.key==='ArrowLeft')tourNav(-1);
-});
-window.addEventListener('resize',()=>{if(tourOpen)_positionTour(TOUR_STEPS[tourIdx])});
+function startTour(){tourIdx=0;tourOpen=true;const bd=document.getElementById('tour-backdrop'),p=document.getElementById('tour-panel'),r=document.getElementById('tour-ring');p.style.opacity='';p.style.transform='';p.classList.remove('panel-visible');r.classList.remove('ring-visible');bd.classList.add('tour-open');_renderStep(tourIdx);setTimeout(()=>p.classList.add('panel-visible'),50);}
+function closeTour(){tourOpen=false;const bd=document.getElementById('tour-backdrop'),p=document.getElementById('tour-panel'),r=document.getElementById('tour-ring');p.style.opacity='';p.style.transform='';p.classList.remove('panel-visible');r.classList.remove('ring-visible');setTimeout(()=>bd.classList.remove('tour-open'),340);}
+function tourNav(dir){if(!tourOpen)return;const ni=tourIdx+dir;if(ni<0||ni>=TOUR_STEPS.length)return;const p=document.getElementById('tour-panel');p.style.opacity='0';p.style.transform=dir>0?'scale(.94) translateX(18px)':'scale(.94) translateX(-18px)';setTimeout(()=>{tourIdx=ni;_renderStep(tourIdx);p.style.opacity='1';p.style.transform='scale(1) translateX(0)'},210);}
+function tourJump(i){if(!tourOpen||i===tourIdx)return;const dir=i>tourIdx?1:-1,p=document.getElementById('tour-panel');p.style.opacity='0';p.style.transform=dir>0?'scale(.94) translateX(18px)':'scale(.94) translateX(-18px)';setTimeout(()=>{tourIdx=i;_renderStep(tourIdx);p.style.opacity='1';p.style.transform='scale(1) translateX(0)'},210);}
+function _renderStep(i){const s=TOUR_STEPS[i],n=TOUR_STEPS.length;document.getElementById('tp-step-num').textContent=i+1;document.getElementById('tp-step-label').textContent=s.label;document.getElementById('tp-icon').textContent=s.icon;document.getElementById('tp-title').textContent=s.title;document.getElementById('tp-desc').textContent=s.desc;document.getElementById('tp-chips').innerHTML=s.chips.map(c=>`<div class="tp-chip"><i class="fas ${c.icon}"></i>${c.text}</div>`).join('');document.getElementById('tp-dots').innerHTML=TOUR_STEPS.map((_,j)=>{let c='tp-dot';if(j===i)c+=' tp-dot-active';else if(j<i)c+=' tp-dot-done';return `<div class="${c}" onclick="tourJump(${j})"></div>`}).join('');document.getElementById('tp-prev').disabled=i===0;const nb=document.getElementById('tp-next');if(i===n-1){nb.className='tp-btn tp-btn-finish';nb.innerHTML='<i class="fas fa-check"></i> Finish';nb.onclick=closeTour}else{nb.className='tp-btn tp-btn-next';nb.innerHTML='Next <i class="fas fa-chevron-right"></i>';nb.onclick=()=>tourNav(1)}_positionTour(s);}
+function _positionTour(step){const ring=document.getElementById('tour-ring'),panel=document.getElementById('tour-panel'),PW=374,PH=460,M=18,PAD=10,vw=innerWidth,vh=innerHeight;if(step.targetId){const el=document.getElementById(step.targetId);if(el){const r=el.getBoundingClientRect();ring.style.left=(r.left-PAD)+'px';ring.style.top=(r.top-PAD)+'px';ring.style.width=(r.width+PAD*2)+'px';ring.style.height=(r.height+PAD*2)+'px';ring.style.borderRadius='12px';ring.classList.add('ring-visible');let l,t,sr=vw-r.right-M,sl=r.left-M,sb=vh-r.bottom-M;if(sr>=PW+M){l=r.right+M;t=Math.max(M,Math.min(r.top,vh-PH-M))}else if(sl>=PW+M){l=r.left-PW-M;t=Math.max(M,Math.min(r.top,vh-PH-M))}else if(sb>=PH+M){l=Math.max(M,Math.min(r.left,vw-PW-M));t=r.bottom+M}else{l=(vw-PW)/2;t=(vh-PH)/2}l=Math.max(M,Math.min(l,vw-PW-M));t=Math.max(M,Math.min(t,vh-PH-M));panel.style.left=l+'px';panel.style.top=t+'px';return}}ring.classList.remove('ring-visible');panel.style.left=((vw-PW)/2)+'px';panel.style.top=((vh-PH)/2)+'px';}
+document.getElementById('tour-backdrop').addEventListener('click',e=>{if(e.target===e.currentTarget)closeTour()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&tourOpen){closeTour();return}if(!tourOpen)return;if(e.key==='ArrowRight')tourNav(1);if(e.key==='ArrowLeft')tourNav(-1)});window.addEventListener('resize',()=>{if(tourOpen)_positionTour(TOUR_STEPS[tourIdx])});
 
 /* ============================================================
    BROWSER CAMERA ENGINE  v3
@@ -2625,7 +2111,6 @@ window.showPage = function(pageId, el) {
 
 })(); // end camera engine IIFE
 </script>
-
 <!-- ==================== PREMIUM PARTICLE CANVAS ==================== -->
 <script>
 (function(){
